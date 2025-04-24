@@ -23,7 +23,7 @@ def chatpro():
             print("Nagaja.")
             break
 
-        msg = {"msg": msg_input}
+        msg = {"Message": msg_input}
 
         try:
             print("📤 Sending...")
