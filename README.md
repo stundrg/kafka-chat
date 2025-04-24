@@ -22,8 +22,7 @@ pdm install
 
 > `pdm`이 없다면 [설치 가이드](https://pdm.fming.dev/latest/#installation)를 참고하세요.
 
-### 3. CLI 등
-록
+### 3. CLI 등록
 ```bash
 pip install -e .
 ```
