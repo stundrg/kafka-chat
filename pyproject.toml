@@ -1,6 +1,6 @@
 [project]
 name = "kafka-chat"
-version = "0.1.0"
+version = "0.2.0"
 description = "kafka python chat"
 authors = [
     {name = "stundrg", email = "khr0106@naver.com"},
@@ -17,3 +17,7 @@ build-backend = "pdm.backend"
 
 [tool.pdm]
 distribution = true
+package-dir = "src"
+
+[project.scripts]
+chatpro = "kafka_chat.chat_pro:chatpro"
