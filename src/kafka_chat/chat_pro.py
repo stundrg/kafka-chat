@@ -10,7 +10,9 @@ def chatpro():
         producer = KafkaProducer(
             bootstrap_servers=bootstrap_servers,
             value_serializer=lambda v: json.dumps(v, ensure_ascii=False).encode('utf-8')
-        )
+            linger_ms=5000,  # 최대 5초까지 대기 후 batch 전송
+            batch_size=32768  # 기본보다 크게 설정하여 성능 향상
+    )
     except Exception as e:
         print(f"Kafka Producer Create Failed: {e}")
         return
@@ -26,7 +28,7 @@ def chatpro():
         msg = {"Message": msg_input}
 
         try:
-            print("📤 Sending...")
+            print("📤 보냈지롱...")
             producer.send(topic, msg)
         except Exception as e:
             print(f"Sending Error: {e}")
