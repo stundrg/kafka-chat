@@ -6,7 +6,7 @@ import json
 # Kafka 설정
 KAFKA_SERVER = "34.47.84.43:9092"  # 또는 GCP 외부 IP:9092
 TOPIC_NAME = "quickstart-events"
-GROUP_ID = "T없이Hae맑은chil9"
+GROUP_ID = "광진구 화이팅!"
 
 def print_auto():
     # ✅ Kafka Consumer
@@ -20,9 +20,13 @@ def print_auto():
     )
 
     for message in consumer:
-        print(f"\n📩 [받음] {message.value['msg']}\n>>> ", end="")
+        try:
+            payload = message.value
+            print(f"\n📩 [받음] {payload['msg']}\n>>> ", end="")
+        except Exception as e:
+            print(f"\n⚠️ 메시지 파싱 실패: {e} | 원본 메시지: {message.value}\n>>> ", end="")
 
-def main():
+def chatall():
     # ✅ Kafka Producer
     try:
         producer = KafkaProducer(
@@ -52,5 +56,5 @@ def main():
                 print(f"⚠️ 메시지 전송 실패: {e}")
 
 if __name__ == "__main__":
-    main()
+    chatall()
 
