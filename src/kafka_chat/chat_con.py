@@ -18,13 +18,21 @@ def print_auto():
         auto_offset_reset='earliest',
         enable_auto_commit=True
     )
-
+    my_name = GROUP_ID  # 자기 자신의 이름 설정
     for message in consumer:
         try:
             payload = message.value
-            print(f"\n📩 [받음] {payload['msg']}\n>>> ", end="")
+            sender = payload.get("user")
+            text = payload.get("text")
+
+            if sender == my_name:
+                continue  # 👈 내 메시지는 출력하지 않음
+
+            print(f"\n📩 [{sender}] {text}\n>>> ", end="")
         except Exception as e:
             print(f"\n⚠️ 메시지 파싱 실패: {e} | 원본 메시지: {message.value}\n>>> ", end="")
+
+
 
 def chatcon():
     # ✅ Kafka Producer
