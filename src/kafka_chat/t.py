@@ -4,9 +4,9 @@ from kafka import KafkaProducer, KafkaConsumer
 import json
 
 # Kafka 설정
-KAFKA_SERVER = "localhost:9092"  # 또는 GCP 외부 IP:9092
-TOPIC_NAME = "chat-topic"
-GROUP_ID = "chat-cli-group"
+KAFKA_SERVER = "34.47.84.43:9092"  # 또는 GCP 외부 IP:9092
+TOPIC_NAME = "quickstart-events"
+GROUP_ID = "T없이Hae맑은chil9"
 
 def print_auto():
     # ✅ Kafka Consumer
