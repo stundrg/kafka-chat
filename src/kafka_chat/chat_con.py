@@ -26,7 +26,7 @@ def print_auto():
         except Exception as e:
             print(f"\n⚠️ 메시지 파싱 실패: {e} | 원본 메시지: {message.value}\n>>> ", end="")
 
-def chatall():
+def chatcon():
     # ✅ Kafka Producer
     try:
         producer = KafkaProducer(
