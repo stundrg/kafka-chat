@@ -9,7 +9,7 @@ def chatpro():
     try:
         producer = KafkaProducer(
             bootstrap_servers=bootstrap_servers,
-            value_serializer=lambda v: json.dumps(v).encode('utf-8')
+            value_serializer=lambda v: json.dumps(v, ensure_ascii=False).encode('utf-8')
         )
     except Exception as e:
         print(f"Kafka Producer Create Failed: {e}")
