@@ -65,6 +65,9 @@ def main():
     try:
         while True:
             msg = input()
+            if msg.strip() == "":
+                continue  # 공백이나 엔터만 누른 경우 무시하고 다시 입력받기
+
             if msg.lower() == "exit":
                 break
 
@@ -77,3 +80,5 @@ def main():
     finally:
         end_chat(producer)
 
+if __name__ == "__main__":
+    main()
