@@ -48,7 +48,11 @@ def chatcon():
             print("프로그램 종료")
             break
         else:
-            msg = {"msg": user_input}
+            msg = {
+            "user": GROUP_ID,
+            "text": user_input
+            }           
+producer.send(TOPIC_NAME, msg)
             try:
                 producer.send(TOPIC_NAME, msg)
                 producer.flush()
