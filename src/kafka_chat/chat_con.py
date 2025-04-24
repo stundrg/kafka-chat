@@ -1,72 +1,79 @@
 import threading
 import time
-from kafka import KafkaProducer, KafkaConsumer
+from kafka import KafkaProducer
+from kafka import KafkaConsumer
 import json
+from datetime import datetime
+import sys
 
-# Kafka 설정
-KAFKA_SERVER = "34.47.84.43:9092"  # 또는 GCP 외부 IP:9092
-TOPIC_NAME = "quickstart-events"
-GROUP_ID = "광진구 화이팅!"
-
-def print_auto():
-    # ✅ Kafka Consumer
-    consumer = KafkaConsumer(
-        TOPIC_NAME,
-        bootstrap_servers=KAFKA_SERVER,
-        group_id=GROUP_ID,
-        value_deserializer=lambda m: json.loads(m.decode('utf-8')),
-        auto_offset_reset='earliest',
-        enable_auto_commit=True
+def create_producer(server_ip: str) -> KafkaProducer:
+    return KafkaProducer(
+        bootstrap_servers=f"{server_ip}:9092",
+        value_serializer=lambda v: json.dumps(v, ensure_ascii=False).encode("utf-8")
     )
-    my_name = GROUP_ID  # 자기 자신의 이름 설정
-    for message in consumer:
-        try:
-            payload = message.value
-            sender = payload.get("user")
-            text = payload.get("text")
 
-            if sender == my_name:
-                continue  # 👈 내 메시지는 출력하지 않음
+def create_consumer(server_ip: str, topic: str) -> KafkaConsumer:
+    return KafkaConsumer(
+        topic,
+        bootstrap_servers=f'{server_ip}:9092',
+        value_deserializer=lambda v: json.loads(v.decode("utf-8")),
+        group_id=None,  # 각자 모든 메시지 수신
+    )
 
-            print(f"\n📩 [{sender}] {text}\n>>> ", end="")
-        except Exception as e:
-            print(f"\n⚠️ 메시지 파싱 실패: {e} | 원본 메시지: {message.value}\n>>> ", end="")
+def get_formatted_msg(msg: str) -> str:
+    now = datetime.now().strftime("%H:%M")
+    return f"[{now}] {msg}"
 
+def end_chat(producer: KafkaProducer):
+    producer.flush()
+    producer.close()
 
+    print("Good bye!")
+    sys.exit()
 
-def chatcon():
-    # ✅ Kafka Producer
+def show_chat(consumer: KafkaConsumer):
     try:
-        producer = KafkaProducer(
-            bootstrap_servers=KAFKA_SERVER,
-            value_serializer=lambda v: json.dumps(v, ensure_ascii=False).encode('utf-8')
-        )
-    except Exception as e:
-        print(f"❌ KafkaProducer 생성 실패: {e}")
-        return
+        for msg in consumer:
+            value = msg.value
+            if 'msg' in value:
+                print(f"{value['user']}: {value['msg']}")
+            else:
+                print(f"ERROR: {value['error']}")
+    except Exception:
+        print("Good bye!")
+    finally:
+        consumer.close()
 
-    # 백그라운드 Consumer 쓰레드 시작
-    thread = threading.Thread(target=print_auto, daemon=True)
+
+def main():
+    print("Chat program")
+
+    server_ip = input("Server IP: ")
+    topic = input("Topic name: ")
+    nickname = input("Your nickname: ")
+
+    producer = create_producer(server_ip)
+    consumer = create_consumer(server_ip, topic)
+
+    # 백그라운드 쓰레드 시작
+    thread = threading.Thread(target=show_chat, args=(consumer,), daemon=True)
     thread.start()
 
-    # 사용자 입력 → 메시지 전송
-    while True:
-        user_input = input(">>> ")
-        if user_input.lower() == 'exit':
-            print("프로그램 종료")
-            break
-        else:
-            msg = {
-            "user": GROUP_ID,
-            "text": user_input
-            }           
-producer.send(TOPIC_NAME, msg)
-            try:
-                producer.send(TOPIC_NAME, msg)
-                producer.flush()
-            except Exception as e:
-                print(f"⚠️ 메시지 전송 실패: {e}")
+    # 사용자 입력 받기
+    print("메시지를 입력하세요 (종료하려면 'exit' 입력)")
 
-if __name__ == "__main__":
-    chatall()
+    try:
+        while True:
+            msg = input()
+            if msg.lower() == "exit":
+                break
+
+            msg = get_formatted_msg(msg)
+            producer.send(topic, {"user": nickname, "msg": msg})
+            producer.flush()
+    except Exception as e:
+        error_msg = get_formatted_msg(f"An error occurred: {str(e)}")
+        producer.send(topic, {"user": nickname, "error": error_msg})
+    finally:
+        end_chat(producer)
 
