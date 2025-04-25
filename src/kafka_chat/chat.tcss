@@ -1,0 +1,11 @@
+#chat_area {
+    height: 1fr;
+    padding: 1;
+    overflow-y: auto;
+}
+
+#chat_input {
+    height: 3;
+    padding: 1;
+}
+
