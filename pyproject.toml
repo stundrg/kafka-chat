@@ -21,3 +21,4 @@ package-dir = "src"
 
 [project.scripts]
 chatpro = "kafka_chat.chat_pro:chatpro"
+chatcon = "kafka_chat.chat_con:chatcon"
